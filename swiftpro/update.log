@@ -1,0 +1,89 @@
+v3.2.0 20171025
+new stable version release.
+
+v3.1.30 20171009
+add M2241 (set pin as input)
+reduce system load so it can report position while moving.
+
+v3.1.29 20170929
+add temperature filter
+
+v3.1.23 20170915
+add grove modules(oled, angle sensor etc.)
+
+v3.1.22 20170908
+return E26 when routine unavailable.
+return @9 V0 when stop(send M2122 V1 to activate this function)
+support M3(laser_on), M5(laser_off)
+fix BUG: add filter to Power Detect to avoid wrong report(@5 V0/V1)
+
+
+v3.1.21 20170905
+refactor grove modules 
+M2300, M2301,M2302, M2303 are deprecated.
+use new commands instead:
+M2304 Pn (deinit)
+M2305 Pn Nn ...(init)
+M2306 Pn Vtime (report)
+M2307 Pn ...(control)
+
+v3.1.20 20170829
+compatible to hw1.1
+
+v3.1.19 20170810
+save front and height offset to E2PROM when set
+
+v3.1.18	20170725
+Return E22 when position unreachable
+
+v3.1.17	20170725
+Do no switch to absolute mode in G2204/G2205
+
+v3.1.16	20170724
+Use B point for calibration.(command: "M2401 B")
+
+v3.1.15	20170720
+update grove color sersor lib
+update RGBLCD lib
+
+v3.1.14	20170712
+fix bug: LCD cannot display the content that begins with "T"
+Add save acceleration function
+
+v3.1.13	20170711
+update grove RGBLCD lib 
+
+v3.1.12	20170707
+Add grove RGBLCD lib 
+report 3D Printer temperature error (@7 temp_error)
+
+v3.1.11	20170629
+optimize M2245 (change Bluetooth name)
+
+v3.1.10	20170628
+Add grove Temperature & Humidity /PIR Motion /electromagnet sensor lib
+
+v3.1.9	20170622
+Improve learning mode performence
+Add M2500 cmd to use OpenMV.
+
+v3.1.8	20170620
+update grove color sersor lib
+
+v3.1.7	20170615
+improve learning performence.
+
+v3.1.6	20170613
+support grove mini fan(use D8 port or D9 port)
+fix the jerk of 4th axis in moving and playing mode
+fix the unpredictable working of valve during the learning mode
+
+v3.1.4	20170527
+support grove ultrasonic(use D8 port)
+
+v3.1.3 	20170525
+fix bug: cannot release object from pump
+
+v3.1.2 	20170505
+First Release Version
+
