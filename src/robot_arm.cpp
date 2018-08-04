@@ -14,52 +14,71 @@ void RobotArm::move(Coordinate3D coordinates, int speed) {
     createGCode(coordinates, speed);
     saveCoordinates(coordinates);
     saveSpeed(speed);
-    connection.writeData(gCode, 255);
-    readData();
+    writeData(gCode, sizeof(gCode));
 }
 
 void RobotArm::moveX(int value) {
     xPosition = value;
     Coordinate3D coordinates = Coordinate3D(value, yPosition, zPosition);
     createGCode(coordinates, speed);
-    connection.writeData(gCode, 255);
-    readData();
+    writeData(gCode, sizeof(gCode));
 }
 
 void RobotArm::moveY(int value) {
     yPosition = value;
     Coordinate3D coordinates = Coordinate3D(xPosition, value, zPosition);
     createGCode(coordinates, speed);
-    connection.writeData(gCode, 255);
-    readData();
+    writeData(gCode, sizeof(gCode));
 }
 
 void RobotArm::moveZ(int value) {
     zPosition = value;
     Coordinate3D coordinates = Coordinate3D(xPosition, yPosition, value);
     createGCode(coordinates, speed);
-    connection.writeData(gCode, 255);
-    readData();
+    writeData(gCode, sizeof(gCode));
 }
 
 void RobotArm::closeClaw() {
-    connection.writeData("M2232 V1\n", 255);
+    strcopy(gCode, "M2232 V1\n");
+    writeData(gCode, sizeof(gCode));
 }
 
 void RobotArm::openClaw() {
-    connection.writeData("M2232 V0\n", 255);
-}
-
-char* RobotArm::readData() {
-    connection.readData(response, 100);
-    // std::cout << response << std::endl;
-    return response;
+    strcopy(gCode, "M2232 V0\n");
+    writeData(gCode, sizeof(gCode));
 }
 
 void RobotArm::saveCoordinates(Coordinate3D coordinates) {
     xPosition = coordinates.getX();
     yPosition = coordinates.getY();
     zPosition = coordinates.getZ();
+}
+
+void RobotArm::writeData(const char *command, unsigned int size) {
+    connection.writeData(command, size);
+    connection.writeData("\n", 1);
+    // readData();
+}
+
+char* RobotArm::readData() {
+    connection.readData(response, 1024);
+    std::cout << "\n\n\n";
+    std::cout << response << std::endl;
+    std::cout << "\n\n\n";
+    return response;
+}
+
+
+bool RobotArm::commandDone() {
+    readData();
+    for (int i = 0; i < sizeof(response); i++) {
+        if (response[i] == 'o') {
+            if (response[i+1] == 'k') {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 void RobotArm::saveSpeed(int _speed) {

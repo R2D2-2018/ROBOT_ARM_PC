@@ -13,14 +13,14 @@
 
 class RobotArm {
 private:
-    Serial connection = Serial("\\\\.\\COM7", 115200);
-    char * response;
+    Serial connection = Serial("\\\\.\\COM7");
     char gCode[25];
     int MESSAGE_SIZE = 255;
     int xPosition = 120;
     int yPosition = 120;
     int zPosition = 120;
-    int speed;
+    int speed = 50000;
+    char response[1024];
 public:
     /**
      * @brief Construct a new Robot Arm object
@@ -43,6 +43,8 @@ public:
     void openClaw();
     void saveCoordinates(Coordinate3D coordinates);
     void saveSpeed(int speed);
+    void writeData(const char *command, unsigned int size);
+    bool commandDone();
     char* readData();
     /**
      * @brief Create a G-code from coordinates and speed
