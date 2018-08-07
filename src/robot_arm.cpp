@@ -7,7 +7,8 @@
 #include "robot_arm.hpp"
 
 RobotArm::RobotArm() {
-    
+    strcopy(gCode, "P2202\n"); // Send a command to ensure the connection is working. This should return the hardware version.
+    writeData(gCode, sizeof(gCode));
 }
 
 void RobotArm::move(Coordinate3D coordinates, int speed) {
@@ -38,6 +39,11 @@ void RobotArm::moveZ(int value) {
     writeData(gCode, sizeof(gCode));
 }
 
+void RobotArm::resetPosition() {
+    strcopy(gCode, "G0 X150 Y0 Z0 F50000\n");
+    writeData(gCode, sizeof(gCode));
+}
+
 void RobotArm::closeClaw() {
     strcopy(gCode, "M2232 V1\n");
     writeData(gCode, sizeof(gCode));
@@ -57,7 +63,6 @@ void RobotArm::saveCoordinates(Coordinate3D coordinates) {
 void RobotArm::writeData(const char *command, unsigned int size) {
     connection.writeData(command, size);
     connection.writeData("\n", 1);
-    // readData();
 }
 
 char* RobotArm::readData() {
@@ -67,7 +72,6 @@ char* RobotArm::readData() {
     std::cout << "\n\n\n";
     return response;
 }
-
 
 bool RobotArm::commandDone() {
     readData();

@@ -7,7 +7,7 @@ Serial::Serial(const char *portName)
 
     //Try to connect to the given port throuh CreateFile
     this->hSerial = CreateFile(portName,
-            GENERIC_READ | GENERIC_WRITE,
+                GENERIC_READ | GENERIC_WRITE,
             0,
             NULL,
             OPEN_EXISTING,
