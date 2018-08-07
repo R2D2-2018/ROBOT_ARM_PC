@@ -135,41 +135,6 @@ public:
      * @param speed 
      */
     void createGCode(Coordinate3D coordinates, int speed);
-    /**
-     * @brief intToChar function
-     *
-     * This function takes an integer number and converts it to a char *. The char * will be stored in the 'dest'(destination)
-     * parameter
-     *
-     * @param x : int
-     * @param dest  : char *
-     * @return char*
-     */
-    char *intToChar(int x, char *dest);
-
-    /**
-     * @brief strcopy function
-     *
-     * This function is purely here because the STD variant doesn't work on the Arduino. It's a literal copy of strcpy. dest = destination. src =
-     * source.
-     *
-     * @param dest : char *
-     * @param src : const char *
-     * @return char*
-     */
-    char *strcopy(char *dest, const char *src);
-
-    /**
-     * @brief stradd function
-     *
-     * This function is purely here because the STD variant doesn't work on the Arduino. It's a literal copy of strcat. dest = destination. src =
-     * source.
-     *
-     * @param dest : char *
-     * @param src : const char *
-     * @return char*
-     */
-    char *stradd(char *dest, const char *src);
 };
 
 #endif

@@ -7,7 +7,7 @@
 #include "robot_arm.hpp"
 
 RobotArm::RobotArm() {
-    strcopy(gCode, "P2202\n"); // Send a command to ensure the connection is working. This should return the hardware version.
+    strcpy(gCode, "P2202\n"); // Send a command to ensure the connection is working. This should return the hardware version.
     writeData(gCode, sizeof(gCode));
 }
 
@@ -15,6 +15,7 @@ void RobotArm::move(Coordinate3D coordinates, int speed) {
     createGCode(coordinates, speed);
     saveCoordinates(coordinates);
     saveSpeed(speed);
+    std::cout << gCode << std::endl;
     writeData(gCode, sizeof(gCode));
 }
 
@@ -40,17 +41,17 @@ void RobotArm::moveZ(int value) {
 }
 
 void RobotArm::resetPosition() {
-    strcopy(gCode, "G0 X150 Y0 Z0 F50000\n");
+    strcpy(gCode, "G0 X150 Y0 Z0 F50000\n");
     writeData(gCode, sizeof(gCode));
 }
 
 void RobotArm::closeClaw() {
-    strcopy(gCode, "M2232 V1\n");
+    strcpy(gCode, "M2232 V1\n");
     writeData(gCode, sizeof(gCode));
 }
 
 void RobotArm::openClaw() {
-    strcopy(gCode, "M2232 V0\n");
+    strcpy(gCode, "M2232 V0\n");
     writeData(gCode, sizeof(gCode));
 }
 
@@ -95,52 +96,18 @@ void RobotArm::createGCode(Coordinate3D coordinates, int speed) {
     char coordinatesAsTextZ[4];
     char speedAsText[7];
 
-    intToChar(coordinates.getX(), coordinatesAsTextX);
-    intToChar(coordinates.getY(), coordinatesAsTextY);
-    intToChar(coordinates.getZ(), coordinatesAsTextZ);
-    intToChar(speed, speedAsText);
+    itoa(coordinates.getX(), coordinatesAsTextX, 10);
+    itoa(coordinates.getY(), coordinatesAsTextY, 10);
+    itoa(coordinates.getZ(), coordinatesAsTextZ, 10);
+    itoa(speed, speedAsText, 10);
 
-    strcopy(gCode, "G0 X");
-    stradd(gCode, coordinatesAsTextX);
-    stradd(gCode, " Y");
-    stradd(gCode, coordinatesAsTextY);
-    stradd(gCode, " Z");
-    stradd(gCode, coordinatesAsTextZ);
-    stradd(gCode, " F");
-    stradd(gCode, speedAsText);
-    stradd(gCode, "\n");
-}
-
-char *RobotArm::stradd(char *dest, const char *src) {
-    char i, j;
-    for (i = 0; dest[i] != '\0'; i++) {
-    }
-    for (j = 0; src[j] != '\0'; j++) {
-        dest[i + j] = src[j];
-    }
-    dest[i + j] = '\0';
-    return dest;
-}
-
-char *RobotArm::strcopy(char *dest, const char *src) {
-    char *saved = dest;
-    while (*src) {
-        *dest++ = *src++;
-    }
-    *dest++ = '\0';
-    *dest = 0;
-    return saved;
-}
-
-char *RobotArm::intToChar(int number, char *dest) {
-    if (number / 10 == 0) {
-        *dest++ = number + '0';
-        *dest = '\0';
-        return dest;
-    }
-
-    dest = intToChar(number / 10, dest);
-    *dest++ = number % 10 + '0';
-    *dest = '\0';
-    return dest;
+    strcpy(gCode, "G0 X");
+    strcat(gCode, coordinatesAsTextX);
+    strcat(gCode, " Y");
+    strcat(gCode, coordinatesAsTextY);
+    strcat(gCode, " Z");
+    strcat(gCode, coordinatesAsTextZ);
+    strcat(gCode, " F");
+    strcat(gCode, speedAsText);
+    strcat(gCode, "\n");
 }

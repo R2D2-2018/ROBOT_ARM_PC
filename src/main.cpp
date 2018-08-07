@@ -14,7 +14,7 @@
 int main() {
     RobotArm uArm = RobotArm();
     
-    Coordinate3D coordinates = Coordinate3D(180, 150, 150);
+    Coordinate3D coordinates = Coordinate3D(180, 50, 150);
     int speed = 50000;
 
     sleep(2); // Wait until the serial connection is set up and the uArm responds.
