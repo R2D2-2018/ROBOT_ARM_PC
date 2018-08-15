@@ -27,6 +27,8 @@ int main() {
     uArm.closeClaw();
     while(!uArm.commandDone());
 
+    sleep(2);
+
     std::cout << "Resetting position" << std::endl;
     uArm.resetPosition();
     while(!uArm.commandDone());

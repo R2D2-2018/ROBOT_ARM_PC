@@ -91,23 +91,18 @@ void RobotArm::saveSpeed(int _speed) {
 }
 
 void RobotArm::createGCode(Coordinate3D coordinates, int speed) {
-    char coordinatesAsTextX[4];
-    char coordinatesAsTextY[4];
-    char coordinatesAsTextZ[4];
-    char speedAsText[7];
-
-    itoa(coordinates.getX(), coordinatesAsTextX, 10);
-    itoa(coordinates.getY(), coordinatesAsTextY, 10);
-    itoa(coordinates.getZ(), coordinatesAsTextZ, 10);
-    itoa(speed, speedAsText, 10);
+    std::string coordinatesAsTextX = std::to_string(coordinates.getX());
+    std::string coordinatesAsTextY = std::to_string(coordinates.getY());
+    std::string coordinatesAsTextZ = std::to_string(coordinates.getZ());
+    std::string speedAsText = std::to_string(speed);
 
     strcpy(gCode, "G0 X");
-    strcat(gCode, coordinatesAsTextX);
+    strcat(gCode, coordinatesAsTextX.c_str());
     strcat(gCode, " Y");
-    strcat(gCode, coordinatesAsTextY);
+    strcat(gCode, coordinatesAsTextY.c_str());
     strcat(gCode, " Z");
-    strcat(gCode, coordinatesAsTextZ);
+    strcat(gCode, coordinatesAsTextZ.c_str());
     strcat(gCode, " F");
-    strcat(gCode, speedAsText);
+    strcat(gCode, speedAsText.c_str());
     strcat(gCode, "\n");
 }

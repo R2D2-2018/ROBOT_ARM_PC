@@ -10,10 +10,14 @@
 #include "coordinate3d.hpp"
 #include "serial.hpp"
 #include <iostream>
+#include <stdio.h>
+#include <cstring>
+# include <stdlib.h>
 
 class RobotArm {
 private:
-    Serial connection = Serial("\\\\.\\COM7");
+    // Serial connection = Serial("\\\\.\\COM7");
+    Serial connection = Serial("/dev/ttyACM0");
     char gCode[25];
     int MESSAGE_SIZE = 255;
     int xPosition = 120;
