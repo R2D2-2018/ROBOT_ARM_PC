@@ -9,22 +9,50 @@
 
 #include "coordinate3d.hpp"
 #include "serial.hpp"
+#include <cstring>
 #include <iostream>
 #include <stdio.h>
-#include <cstring>
-# include <stdlib.h>
+#include <stdlib.h>
+#include <unistd.h> // Sleep function
 
 class RobotArm {
 private:
-    // Serial connection = Serial("\\\\.\\COM7");
-    Serial connection = Serial("/dev/ttyACM0");
+    // Serial connection = Serial("\\\\.\\COM7"); // Windows
+    Serial connection = Serial("/dev/ttyACM0"); // Linux (dmesg | grep tty)
+    bool moving = false;
     char gCode[25];
+    char response[1024];
     int MESSAGE_SIZE = 255;
     int xPosition = 120;
     int yPosition = 120;
     int zPosition = 120;
     int speed = 50000;
-    char response[1024];
+
+    /**
+     * @brief Create a G-code from coordinates and speed
+     * 
+     * This function creates a G-code from the passed coordinates and speed.
+     * 
+     * @param coordinates 
+     * @param speed 
+     */
+    void getMoveCode(Coordinate3D coordinates, int speed);
+    /**
+     * @brief Store the coordinates
+     * 
+     * This function stores the location pass as parameter in a local variable.
+     * 
+     * @param coordinates 
+     */
+    void saveCoordinates(Coordinate3D coordinates);
+    /**
+     * @brief Store the speed
+     * 
+     * Store the speed passed as parameter in a local variable.
+     * 
+     * @param speed 
+     */
+    void saveSpeed(int speed);
 public:
     /**
      * @brief Construct a new Robot Arm object
@@ -65,19 +93,36 @@ public:
      */
     void moveZ(int value);
     /**
+     * @brief Move X position a delta
+     * 
+     * Move the uArm to a delta from current X position.
+     * 
+     * @param value 
+     */
+    void moveDeltaX(int value);
+    /**
+     * @brief Move Y position a delta
+     * 
+     * Move the uArm to a delta from current Y position.
+     * 
+     * @param value 
+     */
+    void moveDeltaY(int value);
+    /**
+     * @brief Move Z position a delta
+     * 
+     * Move the uArm to a delta from current Z position.
+     * 
+     * @param value 
+     */
+    void moveDeltaZ(int value);
+    /**
      * @brief Close the claw
      * 
      * This function closes the claw (if attached)
      * 
      */
     void closeClaw();
-    /**
-     * @brief Reset position
-     * 
-     * This function moves to uArm to a neutral position.
-     * 
-     */
-    void resetPosition();
     /**
      * @brief Open the claw
      * 
@@ -86,21 +131,35 @@ public:
      */
     void openClaw();
     /**
-     * @brief Store the coordinates
+     * @brief Reset position
      * 
-     * This function stores the location pass as parameter in a local variable.
+     * This function moves to uArm to a neutral position.
+     * 
+     */
+    void resetPosition();
+    Coordinate3D getActualCoordinates();
+    /**
+     * @brief Is the move safe to do?
+     * 
+     * Are the coordinates passed parameter safe (reachable) to move to?
      * 
      * @param coordinates 
+     * @return true 
+     * @return false 
      */
-    void saveCoordinates(Coordinate3D coordinates);
+    bool isSafeToMove(Coordinate3D coordinates);
     /**
-     * @brief Store the speed
+     * @brief Checks if a command is done
      * 
-     * Store the speed passed as parameter in a local variable.
+     * This function first calls the readData function, this way the response is updated.
+     * Using the response, this function looks for "ok" in the response. 
+     * This phrase is send by the uArm when a command is succesfully executed.
      * 
-     * @param speed 
+     * @return 0, when not ready 
+     * @return 1, when ready
+     * @return 2, when not ready. but you can do something else meanwhile (e.g. when moving) 
      */
-    void saveSpeed(int speed);
+    int commandDone();
     /**
      * @brief Send data to the serial connection
      * 
@@ -111,17 +170,6 @@ public:
      */
     void writeData(const char *command, unsigned int size);
     /**
-     * @brief Checks if a command is done
-     * 
-     * This function first calls the readData function, this way the response is updated.
-     * Using the response, this function looks for "ok" in the response. 
-     * This phrase is send by the uArm when a command is succesfully executed.
-     * 
-     * @return true 
-     * @return false 
-     */
-    bool commandDone();
-    /**
      * @brief Read data from the uArm
      * 
      * This function reads data coming from the uArm. This data will be stored in the `response` variable. 
@@ -130,15 +178,6 @@ public:
      * @return char* 
      */
     char* readData();
-    /**
-     * @brief Create a G-code from coordinates and speed
-     * 
-     * This function creates a G-code from the passed coordinates and speed.
-     * 
-     * @param coordinates 
-     * @param speed 
-     */
-    void createGCode(Coordinate3D coordinates, int speed);
 };
 
 #endif

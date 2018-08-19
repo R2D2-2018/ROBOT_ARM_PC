@@ -3,37 +3,65 @@
 
 #define ARDUINO_WAIT_TIME 2000
 
+#include <cstring>
+#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string>
+#include <vector>
+
 #ifdef _WIN32
     #include <windows.h>
-    #include <stdio.h>
-    #include <iostream>
-    #include <stdlib.h>
-    #include <string>
+    
+    // For more info about the Windows part: http://playground.arduino.cc/Interfacing/CPPWindows
     class Serial {
         private:
-            //Serial comm handler
             HANDLE hSerial;
-            //Connection status
             bool connected;
-            //Get various information about the connection
             COMSTAT status;
-            //Keep track of last error
             DWORD errors;
 
         public:
-            //Initialize Serial communication with the given COM port
+            /**
+             * @brief Construct a new Serial object
+             * 
+             * @param portName 
+             */
             Serial(const char *portName);
-            //Close the connection
+            /**
+             * @brief Destroy the Serial object
+             * 
+             */
             ~Serial();
-            //Read data in a buffer, if nbChar is greater than the
-            //maximum number of bytes available, it will return only the
-            //bytes available. The function return -1 when nothing could
-            //be read, the number of bytes actually read.
+            /**
+             * @brief Read data from uArm.
+             * 
+             * This functions reads data from the uArm. The read data will be stored in the buffer parameter. Returns -1 if nothing could be read.
+             * 
+             * @param buffer 
+             * @param size 
+             * @return int 
+             */
             int readData(char *buffer, unsigned int size);
-            //Writes data from a buffer through the Serial connection
-            //return true on success.
+            /**
+             * @brief Write data to the uArm.
+             * 
+             * This function writes "size" bytes of data to the uArm. When the data is sent succesfully, true will be returned.
+             * 
+             * @param buffer 
+             * @param size 
+             * @return true 
+             * @return false 
+             */
             bool writeData(const char *buffer, unsigned int size);
-            //Check if we are actually connected
+            /**
+             * @brief Check if we're connected with the Robot Arm.
+             * 
+             * This functions returns a boolean value depending on whether or not we're connected to the uArm.
+             * 
+             * @return true 
+             * @return false 
+             */
             bool isConnected();
 
 
@@ -41,24 +69,59 @@
 #endif // Windows
 
 #ifdef __unix
-    #include <stdio.h>
-    #include <iostream>
-    #include <stdlib.h>
-    #include <string>
     #include <errno.h> /* ERROR Number Definitions           */
     #include <fcntl.h> /* File Control Definitions           */
     #include <termios.h> /* POSIX Terminal Control Definitions */
     #include <unistd.h>  /* UNIX Standard Definitions 	   */
 
     class Serial {
-        private:
+    private:
+        bool connected;
+        int file;
         std::string string_value;
 
     public:
-        int file;
+        /**
+         * @brief Construct a new Serial object
+         * 
+         * @param portName 
+         */
         Serial(const char *portName);
+        /**
+         * @brief Destroy the Serial object
+         * 
+         */
+        ~Serial();
+        /**
+         * @brief Read data from uArm.
+         * 
+         * This functions reads data from the uArm. The read data will be stored in the buffer parameter.
+         * 
+         * @param buffer 
+         * @param size 
+         * @return int 
+         */
         int readData(char *buffer, unsigned int size);
-        void writeData(const char *buffer, unsigned int size);
+        /**
+         * @brief Write data to uArm.
+         * 
+         * This function writes "size" bytes of data to the uArm. When the data is sent succesfully, true will be returned.
+         * 
+         * @param buffer 
+         * @param size 
+         * @return true 
+         * @return false 
+         */
+        bool writeData(const char *buffer, unsigned int size);
+        /**
+         * @brief Check if we're connected with the Robot Arm.
+         * 
+         * This functions returns a boolean value depending on whether or not we're connected to the uArm.
+         * 
+         * @return true 
+         * @return false 
+         */
+        bool isConnected();
     };
 #endif // Linux
 
