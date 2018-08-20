@@ -88,6 +88,47 @@ class Coordinate3D {
     void setZ(int value) {
         z = value;
     }
+
+    Coordinate3D operator+(const Coordinate3D &other) const {
+        Coordinate3D temp(*this);
+
+        temp += other;
+
+        return temp;
+    }
+
+    Coordinate3D operator-(const Coordinate3D &other) const {
+        Coordinate3D temp(*this);
+
+        temp -= other;
+
+        return temp;
+    }
+
+    void operator+=(const Coordinate3D &other) {
+        x += other.x;
+        y += other.y;
+        z += other.z;
+    }
+
+    void operator-=(const Coordinate3D &other) {
+        x -= other.x;
+        y -= other.y;
+        z -= other.z;
+    }
+
+    void operator=(const Coordinate3D &other) {
+        x = other.x;
+        y = other.y;
+        z = other.z;
+    }
+
+    bool operator==(const Coordinate3D & other){
+        if((x == other.x) && (y == other.y) && (z == other.z)) {
+            return true;
+        }
+        return false;
+    }
 };
 
 #endif // COORDINATE3D_HPP

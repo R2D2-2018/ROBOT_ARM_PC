@@ -19,13 +19,10 @@ class RobotArm {
 private:
     // Serial connection = Serial("\\\\.\\COM7"); // Windows
     Serial connection = Serial("/dev/ttyACM0"); // Linux (dmesg | grep tty)
-    bool moving = false;
     char gCode[25];
     char response[1024];
     int MESSAGE_SIZE = 255;
-    int xPosition = 120;
-    int yPosition = 120;
-    int zPosition = 120;
+    Coordinate3D currentPosition = Coordinate3D(0, 0, 0);
     int speed = 50000;
 
     /**
@@ -137,7 +134,23 @@ public:
      * 
      */
     void resetPosition();
-    Coordinate3D getActualCoordinates();
+    /**
+     * @brief Get the position of the arm
+     * 
+     * This function returns the current position of the uArm.
+     * 
+     * @return actualCoordinates 
+     */
+    Coordinate3D getActualPosition();
+    /**
+     * @brief Checks the state of the claw
+     * 
+     * This function checks the current state of the claw.
+     * 
+     * @return false, claw is open
+     * @return true, claw is closed
+     */
+    bool clawState();
     /**
      * @brief Is the move safe to do?
      * 
@@ -154,12 +167,16 @@ public:
      * This function first calls the readData function, this way the response is updated.
      * Using the response, this function looks for "ok" in the response. 
      * This phrase is send by the uArm when a command is succesfully executed.
+     * The `state` parameter is used when you want to make the program wait until the robotarm finished something.
+     * State 0, wait for the uArm to return "ok". This is returned when a command is received
+     * State 1, wait for the uArm to finish moving the arm.
+     * 
+     * @param state 
      * 
      * @return 0, when not ready 
      * @return 1, when ready
-     * @return 2, when not ready. but you can do something else meanwhile (e.g. when moving) 
      */
-    int commandDone();
+    bool commandDone(int state);
     /**
      * @brief Send data to the serial connection
      * 

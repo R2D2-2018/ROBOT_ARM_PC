@@ -27,15 +27,17 @@
 - *     moveSafe()
 - * 
 - FIX SERIAL WINDOWS (receiving too many lines)
+
 */
 #define DATA_LENGTH 255
 
 int main() {
     RobotArm uArm = RobotArm();
     
-    Coordinate3D coordinates = Coordinate3D(150, 50, 150);
+    Coordinate3D coordinates = Coordinate3D(150, -150, 100);
+    Coordinate3D coordinates2 = Coordinate3D(100, -180, 0);
     int x, y, z;
-    int speed = 50000;
+    int speed = 500000;
 
     // while (true) {
     //     std::cout << "Insert values\n";
@@ -43,26 +45,37 @@ int main() {
     //     std::cin >> y;
     //     std::cin >> z;
         
-    //     coordinates = Coordinate3D(x, y, z);
+    //     coordinates = Coordinate3D(x, y, z); 
     //     uArm.move(coordinates, speed);
     //     std::cout << "Command done: " << uArm.commandDone() << std::endl;
     // }
 
-    const char * P2220 = "P2220\n";
+    // const char * P2220 = "P2220\n";
 
-    uArm.writeData(P2220, sizeof(P2220));
-    uArm.readData();
+    // uArm.writeData(P2220, sizeof(P2220));
+    // uArm.readData();
+
+    std::cout << "Moving first time" << std::endl;
 
     uArm.move(coordinates, speed);
-    uArm.readData();
+    while(!uArm.commandDone(1));
 
-    uArm.writeData(P2220, sizeof(P2220));
-    uArm.readData();
+    std::cout << "Moving second time" << std::endl;
 
-    uArm.writeData(P2220, sizeof(P2220));
-    uArm.readData();
+    uArm.move(coordinates2, speed);
+    while(!uArm.commandDone(1));
 
-    uArm.getActualCoordinates();
+    std::cout << "Done moving" << std::endl;
+    
+
+    // uArm.writeData(P2220, sizeof(P2220));
+    // // uArm.readData();
+
+    // uArm.writeData(P2220, sizeof(P2220));
+    // uArm.readData();
+
+
+    // uArm.getActualPosition();
 
     // std::cout << "Moving" << std::endl;
     // uArm.move(coordinates, speed);

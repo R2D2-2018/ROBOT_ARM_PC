@@ -12,16 +12,16 @@ RobotArm::RobotArm() {
     // writeData(gCode, sizeof(gCode));
     readData();
     writeData("\n\n", 2);
+    currentPosition = getActualPosition();
 }
 
 void RobotArm::move(Coordinate3D coordinates, int speed) {
     if (isSafeToMove(coordinates)) {
-        if ((yPosition < 0 && coordinates.getY() > 0) || (yPosition > 0 && coordinates.getY() < 0)) {
+        if ((currentPosition.getY() < 0 && coordinates.getY() > 0) || (currentPosition.getY() > 0 && coordinates.getY() < 0)) {
             resetPosition(); // You can't go from one to the other side directly, so we move the arm back to the center first.
         }
         saveCoordinates(coordinates);
         saveSpeed(speed);
-        moving = true;
         getMoveCode(coordinates, speed);
         std::cout << gCode << std::endl;
         writeData(gCode, sizeof(gCode));
@@ -31,38 +31,38 @@ void RobotArm::move(Coordinate3D coordinates, int speed) {
 }
 
 void RobotArm::moveX(int value) {
-    xPosition = value;
-    Coordinate3D coordinates = Coordinate3D(value, yPosition, zPosition);
+    currentPosition.setX(value);
+    Coordinate3D coordinates = Coordinate3D(value, currentPosition.getY(), currentPosition.getZ());
     move(coordinates, speed);
 }
 
 void RobotArm::moveY(int value) {
-    yPosition = value;
-    Coordinate3D coordinates = Coordinate3D(xPosition, value, zPosition);
+    currentPosition.setY(value);
+    Coordinate3D coordinates = Coordinate3D(currentPosition.getX(), value, currentPosition.getZ());
     move(coordinates, speed);
 }
 
 void RobotArm::moveZ(int value) {
-    zPosition = value;
-    Coordinate3D coordinates = Coordinate3D(xPosition, yPosition, value);
+    currentPosition.setZ(value);
+    Coordinate3D coordinates = Coordinate3D(currentPosition.getX(), currentPosition.getY(), value);
     move(coordinates, speed);
 }
 
 void RobotArm::moveDeltaX(int value) {
-    xPosition = xPosition + value;
-    Coordinate3D coordinates = Coordinate3D(xPosition, yPosition, zPosition);
+    currentPosition.setX(currentPosition.getX() + value);
+    Coordinate3D coordinates = Coordinate3D(currentPosition.getX(), currentPosition.getY(), currentPosition.getZ());
     move(coordinates, speed);
 }
 
 void RobotArm::moveDeltaY(int value) {
-    yPosition = yPosition + value;
-    Coordinate3D coordinates = Coordinate3D(xPosition, yPosition, zPosition);
+    currentPosition.setY(currentPosition.getY() + value);
+    Coordinate3D coordinates = Coordinate3D(currentPosition.getX(), currentPosition.getY(), currentPosition.getZ());
     move(coordinates, speed);
 }
 
 void RobotArm::moveDeltaZ(int value) {
-    zPosition = zPosition + value;
-    Coordinate3D coordinates = Coordinate3D(xPosition, yPosition, zPosition);
+    currentPosition.setZ(currentPosition.getZ() + value);
+    Coordinate3D coordinates = Coordinate3D(currentPosition.getX(), currentPosition.getY(), currentPosition.getZ());
     move(coordinates, speed);
 }
 
@@ -82,9 +82,7 @@ void RobotArm::openClaw() {
 }
 
 void RobotArm::saveCoordinates(Coordinate3D coordinates) {
-    xPosition = coordinates.getX();
-    yPosition = coordinates.getY();
-    zPosition = coordinates.getZ();
+    currentPosition = coordinates;
 }
 
 void RobotArm::writeData(const char *command, unsigned int size) {
@@ -94,11 +92,10 @@ void RobotArm::writeData(const char *command, unsigned int size) {
 
 char* RobotArm::readData() {
     connection.readData(response, 1024);
-    std::cout << response << std::endl;
     return response;
 }
 
-Coordinate3D RobotArm::getActualCoordinates() {
+Coordinate3D RobotArm::getActualPosition() {
     char response[1024];
     std::string value;
     int i = 0;
@@ -110,42 +107,72 @@ Coordinate3D RobotArm::getActualCoordinates() {
     
     while (response[i] != '\0') {
         if (response[i] == 'X') {
-            for (int j = 1; j <= 3; j++) {
+            for (int j = 1; j <= 4; j++) {
                 if(response[i+j] != '.') {
                     value.push_back(response[i+j]);
                 }
             }
+            // std::cout << "X succesfull" << std::endl;
             x = std::stoi(value);
-            std::cout << "X VALUE: " << x << std::endl;
             value.clear();
         }
 
         else if (response[i] == 'Y') {
-            for (int j = 1; j <= 3; j++) {
+            for (int j = 1; j <= 4; j++) {
                 if(response[i+j] != '.') {
                     value.push_back(response[i+j]);
                 }
             }
+            // std::cout << "Y succesfull" << std::endl;
             y = std::stoi(value);
-            std::cout << "Y VALUE: " << x << std::endl;
             value.clear();
         }
 
         else if (response[i] == 'Z') {
-            for (int j = 1; j <= 3; j++) {
+            for (int j = 1; j <= 4; j++) {
                 if(response[i+j] != '.') {
                     value.push_back(response[i+j]);
                 }
             }
+            // std::cout << "Z succesfull" << std::endl;
             z = std::stoi(value);
-            std::cout << "Z VALUE: " << x << std::endl;
             value.clear();
         }
         
         i++;
     }
 
-    std::cout << "Actual coordinates: " << response << "\n";
+    Coordinate3D actualCoordinates(x, y, z);
+    return actualCoordinates;
+}
+
+bool RobotArm::clawState() {
+    char response[1024];
+    std::string value;
+    int clawState;
+    int i = 0;
+
+    strcpy(gCode, "P2232\n");
+    writeData(gCode, sizeof(gCode));
+    strcpy(response, readData());
+    
+    while (response[i] != '\0') {
+        if (response[i] == 'V') {
+            value.push_back(response[i+1]);
+            std::cout << "VALUE: " << value << std::endl;
+            clawState = std::stoi(value);
+            value.clear();
+        }
+        i++;
+    }
+
+    std::cout << "Claw state: " << clawState << std::endl;
+
+    if (clawState == 1) {
+        return true;
+    } else {
+        return false;
+    }
 }
 
 bool RobotArm::isSafeToMove(Coordinate3D coordinates) {
@@ -198,17 +225,25 @@ bool RobotArm::isSafeToMove(Coordinate3D coordinates) {
     return  false;
 }
 
-int RobotArm::commandDone() {
+bool RobotArm::commandDone(int state) {
     readData();
-    for (int i = 0; i < sizeof(response); i++) {
-        if ((response[i] == 'o') && (response[i+1] == 'k')) {
-            return 1;
+
+    std::cout << "Doing stuff" << std::endl;
+    if (state == 0){
+        for (int i = 0; i < sizeof(response); i++) {
+            if ((response[i] == 'o') && (response[i+1] == 'k')) {
+                return true;
+            }
         }
+        return false;
     }
-    if (moving == true) {
-        return 2;
+
+    else if (state == 1){
+        if (currentPosition == getActualPosition()) {
+            return true;
+        }
+        return false;
     }
-    return 0;
 }
 
 void RobotArm::saveSpeed(int _speed) {

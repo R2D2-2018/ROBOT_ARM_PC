@@ -146,20 +146,12 @@
         char response[1024];
         int i = 0;
 
-        // printf("\n +----------------------------------+\n");
-
         while (c!='\r') {
             if (read(file,&c,1) > 0) {
                 response[i] = c;
                 i++;
-                // std::cout << c;
             }
         }
-        
-
-        // printf("\n +----------------------------------+\n");
-
-        // writeData("\n", 1);
         strcpy(buffer, response);
 
         return 1;
