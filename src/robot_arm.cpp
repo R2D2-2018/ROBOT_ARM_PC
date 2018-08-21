@@ -112,33 +112,25 @@ Coordinate3D RobotArm::getActualPosition() {
                     value.push_back(response[i+j]);
                 }
             }
-            // std::cout << "X succesfull" << std::endl;
             x = std::stoi(value);
             value.clear();
-        }
-
-        else if (response[i] == 'Y') {
+        } else if (response[i] == 'Y') {
             for (int j = 1; j <= 4; j++) {
                 if(response[i+j] != '.') {
                     value.push_back(response[i+j]);
                 }
             }
-            // std::cout << "Y succesfull" << std::endl;
             y = std::stoi(value);
             value.clear();
-        }
-
-        else if (response[i] == 'Z') {
+        } else if (response[i] == 'Z') {
             for (int j = 1; j <= 4; j++) {
                 if(response[i+j] != '.') {
                     value.push_back(response[i+j]);
                 }
             }
-            // std::cout << "Z succesfull" << std::endl;
             z = std::stoi(value);
             value.clear();
         }
-        
         i++;
     }
 
@@ -148,9 +140,9 @@ Coordinate3D RobotArm::getActualPosition() {
 
 bool RobotArm::clawState() {
     char response[1024];
-    std::string value;
     int clawState;
     int i = 0;
+    std::string value;
 
     strcpy(gCode, "P2232\n");
     writeData(gCode, sizeof(gCode));
@@ -159,14 +151,11 @@ bool RobotArm::clawState() {
     while (response[i] != '\0') {
         if (response[i] == 'V') {
             value.push_back(response[i+1]);
-            std::cout << "VALUE: " << value << std::endl;
             clawState = std::stoi(value);
             value.clear();
-        }
+        } 
         i++;
     }
-
-    std::cout << "Claw state: " << clawState << std::endl;
 
     if (clawState == 1) {
         return true;
@@ -180,43 +169,45 @@ bool RobotArm::isSafeToMove(Coordinate3D coordinates) {
     int y = coordinates.getY();
     int z = coordinates.getZ();
 
-    if (x <= -355 || x >= 355 || y <= -355 || y >= 355) {
+    if (x <= 120 || x >= 355 || y <= -355 || y >= 355 || z <= 0 || z => 170) {
         return false;
     }
 
-    if ((y >= -80 && y <= 80) && x <= 350) {
+    if ((y >= -60 && y <= 60) && x <= 355 && z <= 90) {
         return true;
-    } else if ((y >= -100 && y <= 100) && x <= 345) {
+    } else if ((y >= -80 && y <= 80) && x <= 350 && z <= 100) {
         return true;
-    } else if ((y >= -120 && y <= 120) && x <= 338) {
+    } else if ((y >= -100 && y <= 100) && x <= 345 && z <= 110) {
         return true;
-    } else if ((y >= -140 && y <= 140) && x <= 335) {
+    } else if ((y >= -120 && y <= 120) && x <= 338 && z <= 120) {
         return true;
-    } else if ((y >= -160 && y <= 160) && x <= 325) {
+    } else if ((y >= -140 && y <= 140) && x <= 335 && z <= 125) {
         return true;
-    } else if ((y >= -180 && y <= 180) && x <= 310) {
+    } else if ((y >= -160 && y <= 160) && x <= 325 && z <= 135) {
         return true;
-    } else if ((y >= -200 && y <= 200) && x <= 295) {
+    } else if ((y >= -180 && y <= 180) && x <= 310 && z <= 145) {
         return true;
-    } else if ((y >= -220 && y <= 220) && x <= 280) {
+    } else if ((y >= -200 && y <= 200) && x <= 295 && z <= 155) {
         return true;
-    } else if ((y >= -240 && y <= 240) && x <= 265) {
+    } else if ((y >= -220 && y <= 220) && x <= 280 && z <= 160) {
         return true;
-    } else if ((y >= -260 && y <= 260) && x <= 245) {
+    } else if ((y >= -240 && y <= 240) && x <= 265 && z <= 165) {
         return true;
-    } else if ((y >= -280 && y <= 280) && x <= 225) {
+    } else if ((y >= -260 && y <= 260) && x <= 245 && z <= 170) {
         return true;
-    } else if ((y >= -300 && y <= 300) && x <= 195) {
+    } else if ((y >= -280 && y <= 280) && x <= 225 && z <= 170) {
         return true;
-    } else if ((y >= -320 && y <= 320) && x <= 155) {
+    } else if ((y >= -300 && y <= 300) && x <= 195 && z <= 170) {
         return true;
-    } else if ((y >= -330 && y <= 330) && x <= 140) {
+    } else if ((y >= -320 && y <= 320) && x <= 155 && z <= 150) {
         return true;
-    } else if ((y >= -340 && y <= 340) && x <= 115) {
+    } else if ((y >= -330 && y <= 330) && x <= 140 && z <= 140) {
         return true;
-    } else if ((y >= -350 && y <= 350) && x <= 80) {
+    } else if ((y >= -340 && y <= 340) && x <= 115 && z <= 55) {
         return true;
-    } else if ((y >= -355 && y <= 355) && x >= 0) {
+    } else if ((y >= -350 && y <= 350) && x <= 80 && z <= ) {
+        return true;
+    } else if ((y >= -355 && y <= 355) && x >= 0 && z <= ) {
         return true;
     }
 
@@ -229,7 +220,7 @@ bool RobotArm::commandDone(int state) {
     readData();
 
     std::cout << "Doing stuff" << std::endl;
-    if (state == 0){
+    if (state == 0){ // "ok" command
         for (int i = 0; i < sizeof(response); i++) {
             if ((response[i] == 'o') && (response[i+1] == 'k')) {
                 return true;
@@ -238,7 +229,7 @@ bool RobotArm::commandDone(int state) {
         return false;
     }
 
-    else if (state == 1){
+    else if (state == 1){ // Moving
         if (currentPosition == getActualPosition()) {
             return true;
         }
@@ -258,11 +249,11 @@ void RobotArm::getMoveCode(Coordinate3D coordinates, int speed) {
 
     strcpy(gCode, "G0 X");
     strcat(gCode, coordinatesAsTextX.c_str());
-    strcat(gCode, ".00 Y");
+    strcat(gCode, " Y");
     strcat(gCode, coordinatesAsTextY.c_str());
-    strcat(gCode, ".00 Z");
+    strcat(gCode, " Z");
     strcat(gCode, coordinatesAsTextZ.c_str());
-    strcat(gCode, ".00 F");
+    strcat(gCode, " F");
     strcat(gCode, speedAsText.c_str());
     strcat(gCode, "\n");
 }

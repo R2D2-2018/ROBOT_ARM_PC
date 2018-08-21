@@ -10,10 +10,10 @@
 
 
 /*
-- Te weinig code
+- *     Te weinig code
 - *     Sleep in constructor ipv main
-- commandDone() --> Blocking / Non-blocking versies van move(), closeClaw(), etc.
-- Check of hij klaar is met moven door de huidige coordinaten op te vragen en te vergelijken met de opgegeven coordinaten.
+- *     commandDone() --> Blocking / Non-blocking versies van move(), closeClaw(), etc.
+- *     Check of hij klaar is met moven door de huidige coordinaten op te vragen en te vergelijken met de opgegeven coordinaten.
 - *     Dubbele if in command done; mogelijkheid "ok" te missen als deze op de grens van 2 slices ligt
 - *     readData via return value of niet?
 - *     createGCode kan betere naam hebben: maakt enkel speciale gCodes, en levert niets op. Was beter geweest als deze private is
@@ -39,33 +39,33 @@ int main() {
     int x, y, z;
     int speed = 500000;
 
-    // while (true) {
-    //     std::cout << "Insert values\n";
-    //     std::cin >> x;
-    //     std::cin >> y;
-    //     std::cin >> z;
+    while (true) {
+        std::cout << "Insert values\n";
+        std::cin >> x;
+        std::cin >> y;
+        std::cin >> z;
         
-    //     coordinates = Coordinate3D(x, y, z); 
-    //     uArm.move(coordinates, speed);
-    //     std::cout << "Command done: " << uArm.commandDone() << std::endl;
-    // }
+        coordinates = Coordinate3D(x, y, z); 
+        uArm.move(coordinates, speed);
+        std::cout << "Command done: " << uArm.commandDone(1) << std::endl;
+    }
 
     // const char * P2220 = "P2220\n";
 
     // uArm.writeData(P2220, sizeof(P2220));
     // uArm.readData();
 
-    std::cout << "Moving first time" << std::endl;
+    // std::cout << "Moving first time" << std::endl;
 
-    uArm.move(coordinates, speed);
-    while(!uArm.commandDone(1));
+    // uArm.move(coordinates, speed);
+    // while(!uArm.commandDone(1));
 
-    std::cout << "Moving second time" << std::endl;
+    // std::cout << "Moving second time" << std::endl;
 
-    uArm.move(coordinates2, speed);
-    while(!uArm.commandDone(1));
+    // uArm.move(coordinates2, speed);
+    // while(!uArm.commandDone(1));
 
-    std::cout << "Done moving" << std::endl;
+    // std::cout << "Done moving" << std::endl;
     
 
     // uArm.writeData(P2220, sizeof(P2220));

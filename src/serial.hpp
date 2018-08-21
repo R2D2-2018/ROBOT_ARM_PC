@@ -1,3 +1,9 @@
+/**
+ * @file
+ * @brief     This file contains the Seriallibrary
+ * @author    Jeroen van Hattem
+ * @license   See LICENSE
+ */
 #ifndef SERIAL_HPP
 #define SERIAL_HPP
 

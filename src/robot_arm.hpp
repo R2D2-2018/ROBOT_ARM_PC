@@ -155,6 +155,9 @@ public:
      * @brief Is the move safe to do?
      * 
      * Are the coordinates passed parameter safe (reachable) to move to?
+     * 120  > X < 355
+     * -355 > Y < 355
+     * 0    > Z < 170
      * 
      * @param coordinates 
      * @return true 

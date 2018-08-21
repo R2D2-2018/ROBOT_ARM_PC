@@ -104,6 +104,7 @@
 
         if (file == -1) {
             std::cout << "Can't open " << portName << std::endl;
+            exit(0);
         } else {
             std::cout << portName << " opened succesfully" << std::endl;
             connected = true;
