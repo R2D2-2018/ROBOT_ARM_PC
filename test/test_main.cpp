@@ -2,7 +2,7 @@
  * @file
  * @brief     Test file
  * @author    Jeroen van Hattem
- * @license   MIT
+ * @license   See LICENSE
  */
 #define CATCH_CONFIG_MAIN // This tells Catch to provide a main() - only do this in one cpp file
 #include "../src/coordinate3d.hpp"
@@ -10,28 +10,21 @@
 
 #include "catch.hpp"
 
-RobotArm uarmSwiftPro;
-char text[100];
+RobotArm uArm = RobotArm();
 
-TEST_CASE("Append char* with another char*") {
-    uarmSwiftPro.stradd(text, "how are you?");
-
-    REQUIRE(text == "Hi, how are you?");
+TEST_CASE("Actual coordinates check") {
+    uArm.move()
+    uArm.commandDone(1);
 }
 
-TEST_CASE("Copy char* to another char *") {
-    uarmSwiftPro.strcopy(text, "Hi, ");
+TEST_CASE("Claw state") {
+    uArm.closeClaw();
+    sleep(1);
+    REQUIRE(uArm.clawState());
 
-    REQUIRE(text == "Hi, ");
-}
-
-TEST_CASE("Convert integer to char *") {
-    int x = 100;
-    char buffer[5];
-
-    uarmSwiftPro.intToChar(x, buffer);
-
-    REQUIRE(buffer == "100");
+    uArm.openClaw();
+    sleep(1);
+    REQUIRE(!uArm.clawState());
 }
 
 TEST_CASE("Coordinates 3D get coordinates positive") {
