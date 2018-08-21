@@ -7,18 +7,23 @@
 #ifndef ROBOT_ARM_HPP
 #define ROBOT_ARM_HPP
 
+#ifdef __WIN32__
+    #include <windows.h> 
+#else
+    #include <unistd.h>
+#endif
+
 #include "coordinate3d.hpp"
 #include "serial.hpp"
 #include <cstring>
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h> // Sleep function
 
 class RobotArm {
 private:
-    // Serial connection = Serial("\\\\.\\COM7"); // Windows
-    Serial connection = Serial("/dev/ttyACM0"); // Linux (dmesg | grep tty)
+    Serial connection = Serial("\\\\.\\COM7"); // Windows
+    // Serial connection = Serial("/dev/ttyACM0"); // Linux (dmesg | grep tty)
     char gCode[25];
     char response[1024];
     int MESSAGE_SIZE = 255;
@@ -206,6 +211,14 @@ public:
      * @return char* 
      */
     char* readData();
+    /**
+     * @brief Wait function
+     * 
+     * A platform independent wait function.
+     * 
+     * @param milliseconds 
+     */
+    void mSleep(int milliseconds);
 };
 
 #endif

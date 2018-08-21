@@ -26,7 +26,7 @@
 - *     moveDelta()
 - *     moveSafe()
 - * 
-- FIX SERIAL WINDOWS (receiving too many lines)
+- *     FIX SERIAL WINDOWS (receiving too many lines)
 
 */
 #define DATA_LENGTH 255
@@ -35,7 +35,7 @@ int main() {
     RobotArm uArm = RobotArm();
     
     Coordinate3D coordinates = Coordinate3D(150, -150, 100);
-    Coordinate3D coordinates2 = Coordinate3D(100, -180, 0);
+    // Coordinate3D coordinates2 = Coordinate3D(100, -180, 0);
     int x, y, z;
     int speed = 500000;
 

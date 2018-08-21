@@ -27,7 +27,9 @@ class Coordinate3D {
      * The default constructor to create a new Coordinate3D object.
      *
      */
-    Coordinate3D();
+    Coordinate3D() :
+        x(0), y(0), z(0) {
+    }
     /**
      * @brief Construct a new Coordinate3D object
      *

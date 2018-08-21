@@ -7,7 +7,7 @@
 #include "robot_arm.hpp"
 
 RobotArm::RobotArm() {
-    sleep(2); // Wait until the serial connection is set up and the uArm responds.
+    mSleep(2000); // Wait until the serial connection is set up and the uArm responds.
     // strcpy(gCode, "P2202\n"); // Send a command to ensure the connection is working. This should return the hardware version.
     // writeData(gCode, sizeof(gCode));
     readData();
@@ -103,7 +103,9 @@ Coordinate3D RobotArm::getActualPosition() {
     char response[1024];
     std::string value;
     int i = 0;
-    int x, y, z;
+    int x = 0;
+    int y = 0;
+    int z = 0;
 
     strcpy(gCode, "P2220\n");
     writeData(gCode, sizeof(gCode));
@@ -111,40 +113,47 @@ Coordinate3D RobotArm::getActualPosition() {
     
     while (response[i] != '\0') {
         if (response[i] == 'X') {
-            for (int j = 1; j <= 4; j++) {
+            for (unsigned int j = 1; j <= 4; j++) {
                 if(response[i+j] != '.') {
                     value.push_back(response[i+j]);
                 }
             }
             x = std::stoi(value);
+            std::cout << "Got X: " << value << std::endl;;
             value.clear();
         } else if (response[i] == 'Y') {
-            for (int j = 1; j <= 4; j++) {
+            for (unsigned int j = 1; j <= 4; j++) {
                 if(response[i+j] != '.') {
                     value.push_back(response[i+j]);
                 }
             }
             y = std::stoi(value);
+            std::cout << "Got Y: " << value << std::endl;;
             value.clear();
         } else if (response[i] == 'Z') {
-            for (int j = 1; j <= 4; j++) {
+            for (unsigned int j = 1; j <= 4; j++) {
                 if(response[i+j] != '.') {
                     value.push_back(response[i+j]);
                 }
+                else {
+                    break;
+                }
             }
             z = std::stoi(value);
+
+            std::cout << "Got Z: " << value << std::endl;;
             value.clear();
         }
         i++;
     }
-
+    
     Coordinate3D actualCoordinates(x, y, z);
     return actualCoordinates;
 }
 
 bool RobotArm::clawState() {
     char response[1024];
-    int clawState;
+    int clawState = 0;
     int i = 0;
     std::string value;
 
@@ -225,7 +234,7 @@ bool RobotArm::commandDone(int state) {
 
     std::cout << "Doing stuff" << std::endl;
     if (state == 0){ // "ok" command
-        for (int i = 0; i < sizeof(response); i++) {
+        for (unsigned int i = 0; i < sizeof(response); i++) {
             if ((response[i] == 'o') && (response[i+1] == 'k')) {
                 return true;
             }
@@ -239,6 +248,8 @@ bool RobotArm::commandDone(int state) {
         }
         return false;
     }
+    
+    return false;
 }
 
 void RobotArm::saveSpeed(int _speed) {
@@ -260,4 +271,12 @@ void RobotArm::getMoveCode(Coordinate3D coordinates, int speed) {
     strcat(gCode, " F");
     strcat(gCode, speedAsText.c_str());
     strcat(gCode, "\n");
+}
+
+void RobotArm::mSleep(int milliseconds) {
+    #ifdef __WIN32__
+        Sleep(milliseconds);
+    #else
+        usleep(static_cast<useconds_t>(milliseconds)*1000); //or use nanosleep on platforms where it's needed
+    #endif
 }
