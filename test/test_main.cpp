@@ -6,36 +6,36 @@
  */
 #define CATCH_CONFIG_MAIN // This tells Catch to provide a main() - only do this in one cpp file
 #include "../src/coordinate3d.hpp"
+#include "../src/serial.hpp"
 #include "../src/robot_arm.hpp"
-
 #include "catch.hpp"
+#include <unistd.h> // Sleep function
 
 RobotArm uArm = RobotArm();
 
-
-
-// TEST_CASE("Generate G-Code for moving") {
-    
-// }
+// g++ test_main.cpp ../src/robot_arm.cpp ../src/serial.cpp ../src/coordinate3d.cpp -o test.exe
 
 TEST_CASE("Wait for arm to reach destination") {
-    uArm.move()    
+    Coordinate3D coordinates = Coordinate3D(150, -150, 100);
+    int speed = 50000;
+    uArm.move(coordinates, speed);    
     while(!uArm.commandDone(1));
     REQUIRE(uArm.getCurrentPosition() == uArm.getActualPosition());
 }
 
-TEST_CASE("Actual coordinates check") {
-    uArm.move()
-    uArm.commandDone(1);
-}
+// TEST_CASE("Actual coordinates check") {
+//     Coordinate3D coordinates = Coordinate3D(150, -150, 100);
+//     int speed = 50000;
+//     uArm.move(coordinates, speed);   
+//     sleep(5); 
+//     uArm.commandDone(1);
+// }
 
 TEST_CASE("Claw state") {
     uArm.closeClaw();
-    sleep(1);
     REQUIRE(uArm.clawState());
 
     uArm.openClaw();
-    sleep(1);
     REQUIRE(!uArm.clawState());
 }
 
