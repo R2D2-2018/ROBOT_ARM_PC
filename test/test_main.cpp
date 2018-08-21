@@ -12,6 +12,18 @@
 
 RobotArm uArm = RobotArm();
 
+
+
+// TEST_CASE("Generate G-Code for moving") {
+    
+// }
+
+TEST_CASE("Wait for arm to reach destination") {
+    uArm.move()    
+    while(!uArm.commandDone(1));
+    REQUIRE(uArm.getCurrentPosition() == uArm.getActualPosition());
+}
+
 TEST_CASE("Actual coordinates check") {
     uArm.move()
     uArm.commandDone(1);
