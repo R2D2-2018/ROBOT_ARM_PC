@@ -173,7 +173,7 @@ bool RobotArm::isSafeToMove(Coordinate3D coordinates) {
     int y = coordinates.getY();
     int z = coordinates.getZ();
 
-    if (x <= 120 || x >= 355 || y <= -355 || y >= 355 || z <= 0 || z => 170) {
+    if (x <= 120 || x >= 355 || y <= -355 || y >= 355 || z <= 0 || z >= 170) {
         return false;
     }
 
@@ -209,9 +209,9 @@ bool RobotArm::isSafeToMove(Coordinate3D coordinates) {
         return true;
     } else if ((y >= -340 && y <= 340) && x <= 115 && z <= 55) {
         return true;
-    } else if ((y >= -350 && y <= 350) && x <= 80 && z => 50) {
+    } else if ((y >= -350 && y <= 350) && x <= 80 && z >= 50) {
         return true;
-    } else if ((y >= -355 && y <= 355) && x >= 0 && z => 50 ) {
+    } else if ((y >= -355 && y <= 355) && x >= 0 && z >= 50 ) {
         return true;
     }
 
