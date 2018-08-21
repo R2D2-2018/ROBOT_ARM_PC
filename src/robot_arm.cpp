@@ -95,6 +95,10 @@ char* RobotArm::readData() {
     return response;
 }
 
+Coordinate3D RobotArm::getCurrentPosition() {
+    return currentPosition;
+}
+
 Coordinate3D RobotArm::getActualPosition() {
     char response[1024];
     std::string value;
@@ -205,9 +209,9 @@ bool RobotArm::isSafeToMove(Coordinate3D coordinates) {
         return true;
     } else if ((y >= -340 && y <= 340) && x <= 115 && z <= 55) {
         return true;
-    } else if ((y >= -350 && y <= 350) && x <= 80 && z <= ) {
+    } else if ((y >= -350 && y <= 350) && x <= 80 && z => 50) {
         return true;
-    } else if ((y >= -355 && y <= 355) && x >= 0 && z <= ) {
+    } else if ((y >= -355 && y <= 355) && x >= 0 && z => 50 ) {
         return true;
     }
 

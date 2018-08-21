@@ -135,6 +135,14 @@ public:
      */
     void resetPosition();
     /**
+    * @brief Returns the current position
+    * 
+    * This function returns the currentPosition coordinates
+    *
+    * @return currentCoordinates
+    */
+    Coordinate3D getCurrentPosition();
+    /**
      * @brief Get the position of the arm
      * 
      * This function returns the current position of the uArm.
