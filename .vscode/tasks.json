@@ -12,7 +12,9 @@
         {
             "label": "run",
             "type": "shell",
-            "command": "./main.exe",
+            "windows": {
+                "command": "./main.exe",
+            },
             "problemMatcher": []
         }
     ]
