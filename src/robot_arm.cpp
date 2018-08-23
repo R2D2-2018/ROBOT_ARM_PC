@@ -8,14 +8,12 @@
 
 RobotArm::RobotArm() {
     mSleep(2000); // Wait until the serial connection is set up and the uArm responds.
-    // strcpy(gCode, "P2202\n"); // Send a command to ensure the connection is working. This should return the hardware version.
-    // writeData(gCode, sizeof(gCode));
     readData();
     writeData("\n\n", 2);
     currentPosition = getActualPosition();
 }
 
-void RobotArm::move(Coordinate3D coordinates, int speed) {
+bool RobotArm::move(Coordinate3D coordinates, int speed) {
     if (isSafeToMove(coordinates)) {
         if ((currentPosition.getY() < 0 && coordinates.getY() > 0) || (currentPosition.getY() > 0 && coordinates.getY() < 0)) {
             resetPosition(); // You can't go from one to the other side directly, so we move the arm back to the center first.
@@ -23,11 +21,27 @@ void RobotArm::move(Coordinate3D coordinates, int speed) {
         saveCoordinates(coordinates);
         saveSpeed(speed);
         getMoveCode(coordinates, speed);
+        writeData(gCode, sizeof(gCode));
+        return true;
+    }
+    return false;
+}
+
+bool RobotArm::rotateClaw(int value) {
+    if (value >= 0 && value <= 180) {
+        clawRotation = value;
+        std::string rotation = std::to_string(value);
+        strcpy(gCode, "G2202 N3 V");
+        strcat(gCode, rotation.c_str());
+        strcat(gCode, "\n");
         std::cout << gCode << std::endl;
         writeData(gCode, sizeof(gCode));
-    } else {
-        std::cout << "Not safe to move there" << std::endl;
+        mSleep(300);
+        writeData(gCode, sizeof(gCode)); // Send twice intentionally, sometimes the claw doesn't reach the other side completely.
+        writeData("\n", 1);
+        return true;
     }
+    return false;
 }
 
 void RobotArm::moveX(int value) {
@@ -66,6 +80,11 @@ void RobotArm::moveDeltaZ(int value) {
     move(coordinates, speed);
 }
 
+void RobotArm::resetClaw() {
+    openClaw();
+    rotateClaw(90);
+}
+
 void RobotArm::resetPosition() {
     Coordinate3D coordinates = Coordinate3D(150, 0, 0);
     move(coordinates, 50000);
@@ -81,6 +100,16 @@ void RobotArm::openClaw() {
     writeData(gCode, sizeof(gCode));
 }
 
+void RobotArm::enablePump() {
+    strcpy(gCode, "M2231 V1\n");
+    writeData(gCode, sizeof(gCode));
+}
+
+void RobotArm::disablePump() {
+    strcpy(gCode, "M2231 V0\n");
+    writeData(gCode, sizeof(gCode));
+}
+
 void RobotArm::saveCoordinates(Coordinate3D coordinates) {
     currentPosition = coordinates;
 }
@@ -90,9 +119,41 @@ void RobotArm::writeData(const char *command, unsigned int size) {
     connection.writeData("\n", 1);
 }
 
-char* RobotArm::readData() {
+char *RobotArm::getResponse() {
+    return response;
+}
+
+char *RobotArm::readData() {
     connection.readData(response, 1024);
     return response;
+}
+
+int RobotArm::getClawRotation() {
+    char response[1024];
+    int i = 0;
+    int rotation = 0;
+    std::string value;
+
+    strcpy(gCode, "P2206 N3\n");
+    writeData(gCode, sizeof(gCode));
+    std::cout << gCode << std::endl;
+    strcpy(response, readData());
+    std::cout << "RESPONSE: " << response << std::endl;
+
+    while (response[i] != '\0') {
+        if (response[i] == 'V') {
+            for (unsigned int j = 1; j <= 5; j++) {
+                if (response[i + j] != '.') {
+                    std::cout << response[i + j];
+                    value.push_back(response[i + j]);
+                }
+            }
+            rotation = std::stoi(value);
+            value.clear();
+        }
+        i++;
+    }
+    return rotation;
 }
 
 Coordinate3D RobotArm::getCurrentPosition() {
@@ -100,7 +161,7 @@ Coordinate3D RobotArm::getCurrentPosition() {
 }
 
 Coordinate3D RobotArm::getActualPosition() {
-    char response[1024];
+    char response[30];
     std::string value;
     int i = 0;
     int x = 0;
@@ -110,49 +171,45 @@ Coordinate3D RobotArm::getActualPosition() {
     strcpy(gCode, "P2220\n");
     writeData(gCode, sizeof(gCode));
     strcpy(response, readData());
-    
+    strcpy(response, readData());
+
     while (response[i] != '\0') {
         if (response[i] == 'X') {
             for (unsigned int j = 1; j <= 4; j++) {
-                if(response[i+j] != '.') {
-                    value.push_back(response[i+j]);
+                if (response[i + j] != '.') {
+                    value.push_back(response[i + j]);
                 }
             }
             x = std::stoi(value);
-            std::cout << "Got X: " << value << std::endl;;
             value.clear();
         } else if (response[i] == 'Y') {
             for (unsigned int j = 1; j <= 4; j++) {
-                if(response[i+j] != '.') {
-                    value.push_back(response[i+j]);
+                if (response[i + j] != '.') {
+                    value.push_back(response[i + j]);
                 }
             }
             y = std::stoi(value);
-            std::cout << "Got Y: " << value << std::endl;;
             value.clear();
         } else if (response[i] == 'Z') {
             for (unsigned int j = 1; j <= 4; j++) {
-                if(response[i+j] != '.') {
-                    value.push_back(response[i+j]);
-                }
-                else {
+                if (response[i + j] != '.') {
+                    value.push_back(response[i + j]);
+                } else {
                     break;
                 }
             }
             z = std::stoi(value);
-
-            std::cout << "Got Z: " << value << std::endl;;
             value.clear();
         }
         i++;
     }
-    
+
     Coordinate3D actualCoordinates(x, y, z);
     return actualCoordinates;
 }
 
-bool RobotArm::clawState() {
-    char response[1024];
+bool RobotArm::getClawState() {
+    char response[6];
     int clawState = 0;
     int i = 0;
     std::string value;
@@ -160,17 +217,43 @@ bool RobotArm::clawState() {
     strcpy(gCode, "P2232\n");
     writeData(gCode, sizeof(gCode));
     strcpy(response, readData());
-    
+
     while (response[i] != '\0') {
         if (response[i] == 'V') {
-            value.push_back(response[i+1]);
+            value.push_back(response[i + 1]);
             clawState = std::stoi(value);
             value.clear();
-        } 
+        }
         i++;
     }
 
     if (clawState == 1) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+bool RobotArm::pumpState() {
+    char response[6];
+    int pumpState = 0;
+    int i = 0;
+    std::string value;
+
+    strcpy(gCode, "P2231\n");
+    writeData(gCode, sizeof(gCode));
+    strcpy(response, readData());
+
+    while (response[i] != '\0') {
+        if (response[i] == 'V') {
+            value.push_back(response[i + 1]);
+            pumpState = std::stoi(value);
+            value.clear();
+        }
+        i++;
+    }
+
+    if (pumpState == 1) {
         return true;
     } else {
         return false;
@@ -182,8 +265,12 @@ bool RobotArm::isSafeToMove(Coordinate3D coordinates) {
     int y = coordinates.getY();
     int z = coordinates.getZ();
 
-    if (x <= 120 || x >= 355 || y <= -355 || y >= 355 || z <= 0 || z >= 170) {
+    if (x < 0 || x > 355 || y < -355 || y > 355 || z < 0 || z > 170) {
         return false;
+    }
+
+    if ((x >= 0 && x <= 160) && z <= 150) {
+        return true;
     }
 
     if ((y >= -60 && y <= 60) && x <= 355 && z <= 90) {
@@ -220,35 +307,32 @@ bool RobotArm::isSafeToMove(Coordinate3D coordinates) {
         return true;
     } else if ((y >= -350 && y <= 350) && x <= 80 && z >= 50) {
         return true;
-    } else if ((y >= -355 && y <= 355) && x >= 0 && z >= 50 ) {
+    } else if ((y >= -355 && y <= 355) && x >= 0 && z >= 50) {
         return true;
     }
 
-    std::cout << "Not gonna work" << std::endl;
-
-    return  false;
+    return false;
 }
 
 bool RobotArm::commandDone(int state) {
     readData();
 
-    std::cout << "Doing stuff" << std::endl;
-    if (state == 0){ // "ok" command
+    if (state == 0) { // "ok" command
         for (unsigned int i = 0; i < sizeof(response); i++) {
-            if ((response[i] == 'o') && (response[i+1] == 'k')) {
+            if ((response[i] == 'o') && (response[i + 1] == 'k')) {
                 return true;
             }
         }
         return false;
     }
 
-    else if (state == 1){ // Moving
+    else if (state == 1) { // Moving
         if (currentPosition == getActualPosition()) {
             return true;
         }
         return false;
     }
-    
+
     return false;
 }
 
@@ -274,9 +358,9 @@ void RobotArm::getMoveCode(Coordinate3D coordinates, int speed) {
 }
 
 void RobotArm::mSleep(int milliseconds) {
-    #ifdef __WIN32__
-        Sleep(milliseconds);
-    #else
-        usleep(static_cast<useconds_t>(milliseconds)*1000); //or use nanosleep on platforms where it's needed
-    #endif
+#ifdef __WIN32__
+    Sleep(milliseconds);
+#else
+    usleep(static_cast<useconds_t>(milliseconds) * 1000); // or use nanosleep on platforms where it's needed
+#endif
 }

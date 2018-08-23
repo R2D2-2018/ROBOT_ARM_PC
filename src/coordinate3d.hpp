@@ -7,12 +7,13 @@
 #ifndef COORDINATE3D_HPP
 #define COORDINATE3D_HPP
 
+#include <iostream>
 
 /**
  * @brief Coordinate3D class
- * 
+ *
  * This class is here, because it works easier than an array.
- * 
+ *
  */
 class Coordinate3D {
   private:
@@ -27,8 +28,7 @@ class Coordinate3D {
      * The default constructor to create a new Coordinate3D object.
      *
      */
-    Coordinate3D() :
-        x(0), y(0), z(0) {
+    Coordinate3D() : x(0), y(0), z(0) {
     }
     /**
      * @brief Construct a new Coordinate3D object
@@ -41,7 +41,7 @@ class Coordinate3D {
      *
      */
     Coordinate3D(int x, int y, int z) : x(x), y(y), z(z) {
-    }  
+    }
     /**
      * @brief This function returns the X value of the coordinate
      *
@@ -90,6 +90,15 @@ class Coordinate3D {
     void setZ(int value) {
         z = value;
     }
+    /**
+     * @brief Print the values
+     *
+     * This functions prints the X, Y and Z values.
+     *
+     */
+    void print() {
+        std::cout << "X: " << x << " | Y: " << y << " | Z: " << z << std::endl;
+    }
 
     Coordinate3D operator+(const Coordinate3D &other) const {
         Coordinate3D temp(*this);
@@ -125,8 +134,8 @@ class Coordinate3D {
         z = other.z;
     }
 
-    bool operator==(const Coordinate3D & other){
-        if((x == other.x) && (y == other.y) && (z == other.z)) {
+    bool operator==(const Coordinate3D &other) {
+        if ((x == other.x) && (y == other.y) && (z == other.z)) {
             return true;
         }
         return false;
