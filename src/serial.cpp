@@ -46,7 +46,6 @@ Serial::~Serial() {
 
 int Serial::readData(char *buffer, unsigned int size) {
     DWORD bytesRead;
-    unsigned int toRead;
     char c;
     char response[1024];
     int i = 0;
@@ -54,17 +53,11 @@ int Serial::readData(char *buffer, unsigned int size) {
     ClearCommError(this->hSerial, &this->errors, &this->status);
 
     if (this->status.cbInQue > 0) {
-        if (this->status.cbInQue > size) {
-            toRead = size;
-        } else {
-            toRead = this->status.cbInQue;
-        }
 
         while (c != '\r') {
             if (ReadFile(this->hSerial, &c, 1, &bytesRead, NULL)) {
                 response[i] = c;
                 i++;
-                // return bytesRead;
             }
         }
     }

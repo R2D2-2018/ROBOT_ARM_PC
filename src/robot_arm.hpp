@@ -69,6 +69,8 @@ class RobotArm {
      *
      * @param coordinates
      * @param speed
+     * @return true, if it's safe to move.
+     * @return false, it it isn't safe to move.
      */
     bool move(Coordinate3D coordinates, int speed);
     /**
@@ -88,47 +90,57 @@ class RobotArm {
      *
      * @param value
      */
-    void moveX(int value);
+    bool moveX(int value);
     /**
      * @brief Move Y position
      *
      * Move the uArm to a given position in the Y direction.
      *
      * @param value
+     * @return true, if it's safe to move.
+     * @return false, it it isn't safe to move.
      */
-    void moveY(int value);
+    bool moveY(int value);
     /**
      * @brief Move Z position
      *
      * Move the uArm to a given position in the Z direction.
      *
      * @param value
+     * @return true, if it's safe to move.
+     * @return false, it it isn't safe to move.
      */
-    void moveZ(int value);
+    bool moveZ(int value);
     /**
      * @brief Move X position a delta
      *
      * Move the uArm to a delta from current X position.
      *
      * @param value
+     * @return true, if it's safe to move.
+     * @return false, it it isn't safe to move.
      */
-    void moveDeltaX(int value);
+    bool moveDeltaX(int value);
     /**
      * @brief Move Y position a delta
      *
      * Move the uArm to a delta from current Y position.
      *
      * @param value
+     * @return true, if it's safe to move.
+     * @return false, it it isn't safe to move.
      */
-    void moveDeltaY(int value);
+    bool moveDeltaY(int value);
     /**
      * @brief Move Z position a delta
      *
      * Move the uArm to a delta from current Z position.
      *
      * @param value
+     * @return true, if it's safe to move.
+     * @return false, it it isn't safe to move.
      */
-    void moveDeltaZ(int value);
+    bool moveDeltaZ(int value);
     /**
      * @brief Reset claw
      *
@@ -175,6 +187,7 @@ class RobotArm {
      * @brief Get the Claw Rotation
      *
      * This function returns the rotation of the claw
+     * I was gonna do this by sending "P2206 N3\n" to the uArm, but this doesn't seem to work accordingly.
      *
      * @return int
      */

@@ -38,46 +38,69 @@ bool RobotArm::rotateClaw(int value) {
         writeData(gCode, sizeof(gCode));
         mSleep(300);
         writeData(gCode, sizeof(gCode)); // Send twice intentionally, sometimes the claw doesn't reach the other side completely.
-        writeData("\n", 1);
         return true;
     }
     return false;
 }
 
-void RobotArm::moveX(int value) {
+bool RobotArm::moveX(int value) {
     currentPosition.setX(value);
     Coordinate3D coordinates = Coordinate3D(value, currentPosition.getY(), currentPosition.getZ());
-    move(coordinates, speed);
+    if (move(coordinates, speed)) {
+        return true;
+    }
+    return false;
 }
 
-void RobotArm::moveY(int value) {
+bool RobotArm::moveY(int value) {
     currentPosition.setY(value);
     Coordinate3D coordinates = Coordinate3D(currentPosition.getX(), value, currentPosition.getZ());
-    move(coordinates, speed);
+    if (move(coordinates, speed)) {
+        return true;
+    }
+    return false;
 }
 
-void RobotArm::moveZ(int value) {
+bool RobotArm::moveZ(int value) {
     currentPosition.setZ(value);
     Coordinate3D coordinates = Coordinate3D(currentPosition.getX(), currentPosition.getY(), value);
-    move(coordinates, speed);
+    if (move(coordinates, speed)) {
+        return true;
+    }
+    return false;
 }
 
-void RobotArm::moveDeltaX(int value) {
+bool RobotArm::moveDeltaX(int value) {
+    Coordinate3D coordinates = Coordinate3D(currentPosition.getX() + value, currentPosition.getY(), currentPosition.getZ());
     currentPosition.setX(currentPosition.getX() + value);
-    Coordinate3D coordinates = Coordinate3D(currentPosition.getX(), currentPosition.getY(), currentPosition.getZ());
-    move(coordinates, speed);
+    if (move(coordinates, speed)) {
+        std::cout << "Moved the delta X" << std::endl;
+        return true;
+    }
+    std::cout << "Couldn't move the delta X" << std::endl;
+    return false;
 }
 
-void RobotArm::moveDeltaY(int value) {
+bool RobotArm::moveDeltaY(int value) {
+    Coordinate3D coordinates = Coordinate3D(currentPosition.getX(), currentPosition.getY() + value, currentPosition.getZ());
     currentPosition.setY(currentPosition.getY() + value);
-    Coordinate3D coordinates = Coordinate3D(currentPosition.getX(), currentPosition.getY(), currentPosition.getZ());
-    move(coordinates, speed);
+    if (move(coordinates, speed)) {
+        std::cout << "Moved the delta Y" << std::endl;
+        return true;
+    }
+    std::cout << "Couldn't move the delta Y" << std::endl;
+    return false;
 }
 
-void RobotArm::moveDeltaZ(int value) {
+bool RobotArm::moveDeltaZ(int value) {
+    Coordinate3D coordinates = Coordinate3D(currentPosition.getX(), currentPosition.getY(), currentPosition.getZ() + value);
     currentPosition.setZ(currentPosition.getZ() + value);
-    Coordinate3D coordinates = Coordinate3D(currentPosition.getX(), currentPosition.getY(), currentPosition.getZ());
-    move(coordinates, speed);
+    if (move(coordinates, speed)) {
+        std::cout << "Moved the delta Z" << std::endl;
+        return true;
+    }
+    std::cout << "Couldn't move the delta Z" << std::endl;
+    return false;
 }
 
 void RobotArm::resetClaw() {
@@ -129,31 +152,7 @@ char *RobotArm::readData() {
 }
 
 int RobotArm::getClawRotation() {
-    char response[1024];
-    int i = 0;
-    int rotation = 0;
-    std::string value;
-
-    strcpy(gCode, "P2206 N3\n");
-    writeData(gCode, sizeof(gCode));
-    std::cout << gCode << std::endl;
-    strcpy(response, readData());
-    std::cout << "RESPONSE: " << response << std::endl;
-
-    while (response[i] != '\0') {
-        if (response[i] == 'V') {
-            for (unsigned int j = 1; j <= 5; j++) {
-                if (response[i + j] != '.') {
-                    std::cout << response[i + j];
-                    value.push_back(response[i + j]);
-                }
-            }
-            rotation = std::stoi(value);
-            value.clear();
-        }
-        i++;
-    }
-    return rotation;
+    return clawRotation;
 }
 
 Coordinate3D RobotArm::getCurrentPosition() {
@@ -161,7 +160,7 @@ Coordinate3D RobotArm::getCurrentPosition() {
 }
 
 Coordinate3D RobotArm::getActualPosition() {
-    char response[30];
+    char response[29];
     std::string value;
     int i = 0;
     int x = 0;
@@ -171,40 +170,52 @@ Coordinate3D RobotArm::getActualPosition() {
     strcpy(gCode, "P2220\n");
     writeData(gCode, sizeof(gCode));
     strcpy(response, readData());
-    strcpy(response, readData());
 
     while (response[i] != '\0') {
         if (response[i] == 'X') {
             for (unsigned int j = 1; j <= 4; j++) {
                 if (response[i + j] != '.') {
                     value.push_back(response[i + j]);
+                } else {
+                    i += j;
+                    break;
                 }
             }
             x = std::stoi(value);
             value.clear();
         } else if (response[i] == 'Y') {
-            for (unsigned int j = 1; j <= 4; j++) {
+            for (unsigned int j = 1; j <= 5; j++) {
                 if (response[i + j] != '.') {
                     value.push_back(response[i + j]);
+                } else {
+                    i += j;
+                    break;
                 }
             }
             y = std::stoi(value);
             value.clear();
         } else if (response[i] == 'Z') {
-            for (unsigned int j = 1; j <= 4; j++) {
+            for (unsigned int j = 1; j <= 5; j++) {
                 if (response[i + j] != '.') {
                     value.push_back(response[i + j]);
                 } else {
+                    i += j;
                     break;
                 }
             }
             z = std::stoi(value);
             value.clear();
+            break;
         }
-        i++;
+        if (i < 30) {
+            i++;
+        } else {
+            break;
+        }
     }
-
+    // std::cout << "X:" << x << " | Y: " << y << " | Z: " << z << std::endl;
     Coordinate3D actualCoordinates(x, y, z);
+    currentPosition = actualCoordinates;
     return actualCoordinates;
 }
 
