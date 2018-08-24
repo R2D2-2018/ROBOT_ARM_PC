@@ -31,29 +31,29 @@ TEST_CASE("Safety bounds") {
     REQUIRE(!uArm.move(coordinates, speed));
 }
 
-// TEST_CASE("Move X") {
-//     uArm.moveX(200);
-//     while (!uArm.commandDone(1)) {
-//     }
+TEST_CASE("Move X") {
+    uArm.moveX(200);
+    while (!uArm.commandDone(1)) {
+    }
 
-//     REQUIRE(uArm.getCurrentPosition() == uArm.getActualPosition());
-// }
+    REQUIRE(uArm.getCurrentPosition() == uArm.getActualPosition());
+}
 
-// TEST_CASE("Move Y") {
-//     uArm.moveY(150);
-//     while (!uArm.commandDone(1)) {
-//     }
+TEST_CASE("Move Y") {
+    uArm.moveY(150);
+    while (!uArm.commandDone(1)) {
+    }
 
-//     REQUIRE(uArm.getCurrentPosition() == uArm.getActualPosition());
-// }
+    REQUIRE(uArm.getCurrentPosition() == uArm.getActualPosition());
+}
 
-// TEST_CASE("Move Z") {
-//     uArm.moveZ(80);
-//     while (!uArm.commandDone(1)) {
-//     }
+TEST_CASE("Move Z") {
+    uArm.moveZ(80);
+    while (!uArm.commandDone(1)) {
+    }
 
-//     REQUIRE(uArm.getCurrentPosition() == uArm.getActualPosition());
-// }
+    REQUIRE(uArm.getCurrentPosition() == uArm.getActualPosition());
+}
 
 TEST_CASE("Move delta X") {
     uArm.moveDeltaX(10);
