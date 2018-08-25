@@ -71,6 +71,7 @@ bool RobotArm::moveZ(int value) {
 }
 
 bool RobotArm::moveDeltaX(int value) {
+
     Coordinate3D coordinates = Coordinate3D(currentPosition.getX() + value, currentPosition.getY(), currentPosition.getZ());
     currentPosition.setX(currentPosition.getX() + value);
     if (move(coordinates, speed)) {
@@ -372,6 +373,6 @@ void RobotArm::mSleep(int milliseconds) {
 #ifdef __WIN32__
     Sleep(milliseconds);
 #else
-    usleep(static_cast<useconds_t>(milliseconds) * 1000); // or use nanosleep on platforms where it's needed
+    usleep(static_cast<useconds_t>(milliseconds) * 1000);
 #endif
 }
