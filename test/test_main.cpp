@@ -21,7 +21,6 @@ TEST_CASE("Wait for arm to reach destination") {
     uArm.move(coordinates, speed);
     while (!uArm.commandDone(1)) {
     }
-
     REQUIRE(uArm.getCurrentPosition() == uArm.getActualPosition());
 }
 
@@ -84,7 +83,7 @@ TEST_CASE("Reset position") {
     while (!uArm.commandDone(1)) {
     }
 
-    REQUIRE(uArm.commandDone(1));
+    REQUIRE(uArm.getCurrentPosition() == uArm.getActualPosition());
 }
 
 TEST_CASE("Rotate claw") {
