@@ -94,20 +94,20 @@ TEST_CASE("Rotate claw") {
 
 TEST_CASE("Close claw") {
     uArm.closeClaw();
-    uArm.mSleep(2000);
+    uArm.mSleep(3000);
 
     REQUIRE(uArm.getClawState());
 }
 
 TEST_CASE("Open claw") {
     uArm.openClaw();
-    uArm.mSleep(2000);
+    uArm.mSleep(3000);
 
     REQUIRE(!uArm.getClawState());
 }
 
 TEST_CASE("Enable pump") {
-    uArm.disablePump();
+    uArm.enablePump();
     uArm.mSleep(2000);
 
     REQUIRE(uArm.pumpState());
