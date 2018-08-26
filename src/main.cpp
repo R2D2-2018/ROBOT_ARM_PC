@@ -29,14 +29,11 @@ int main() {
         std::cout << "Waiting for moving unsuccesfull" << std::endl;
     }
 
-    coordinates = Coordinate3D(1000, 300, 100);
-    if (!uArm.move(coordinates, speed)) {
-        std::cout << "Safety Bouds succesfull" << std::endl;
-    } else {
-        std::cout << "Safety Bouds unsuccesfull" << std::endl;
+    uArm.resetPosition();
+    while (!uArm.commandDone(1)) {
     }
 
-    uArm.moveX(200);
+    uArm.moveX(20);
     while (!uArm.commandDone(1)) {
     }
 
@@ -46,7 +43,7 @@ int main() {
         std::cout << "X position unsuccesfull" << std::endl;
     }
 
-    uArm.moveY(150);
+    uArm.moveY(100);
     while (!uArm.commandDone(1)) {
     }
 
@@ -66,7 +63,7 @@ int main() {
         std::cout << "Z position unsuccesfull" << std::endl;
     }
 
-    uArm.moveDeltaX(-10);
+    uArm.moveDeltaX(10);
     while (!uArm.commandDone(1)) {
     }
 
@@ -76,7 +73,7 @@ int main() {
         std::cout << "Delta X position unsuccesfull" << std::endl;
     }
 
-    uArm.moveDeltaY(10);
+    uArm.moveDeltaY(-10);
     while (!uArm.commandDone(1)) {
     }
 
@@ -86,7 +83,7 @@ int main() {
         std::cout << "Delta Y position unsuccesfull" << std::endl;
     }
 
-    uArm.moveDeltaZ(10);
+    uArm.moveDeltaZ(-10);
     while (!uArm.commandDone(1)) {
     }
 
@@ -95,7 +92,6 @@ int main() {
     } else {
         std::cout << "Delta Z position unsuccesfull" << std::endl;
     }
-
     std::cout << "RESETTING" << std::endl;
 
     uArm.resetPosition();
@@ -103,25 +99,31 @@ int main() {
     }
 
     uArm.rotateClaw(180);
+    uArm.mSleep(1000);
     std::cout << "Claw rotation: " << uArm.getClawRotation() << std::endl;
 
     uArm.rotateClaw(0);
+    uArm.mSleep(1000);
     std::cout << "Claw rotation: " << uArm.getClawRotation() << std::endl;
 
+    std::cout << "Closing claw" << std::endl;
     uArm.closeClaw();
     uArm.mSleep(2000);
-    std::cout << "Claw state: " << uArm.getClawState() << std::endl;
+    std::cout << "Claw state: ";
+    std::cout << uArm.getClawState() << std::endl;
 
+    std::cout << "Opening claw" << std::endl;
     uArm.openClaw();
     uArm.mSleep(2000);
-    std::cout << "Claw state: " << uArm.getClawState() << std::endl;
+    std::cout << "Claw state: ";
+    std::cout << uArm.getClawState() << std::endl;
 
     uArm.enablePump();
-    uArm.mSleep(1000);
+    uArm.mSleep(2000);
     std::cout << "Pump state: " << uArm.pumpState() << std::endl;
 
     uArm.disablePump();
-    uArm.mSleep(1000);
+    uArm.mSleep(2000);
     std::cout << "Pump state: " << uArm.pumpState() << std::endl;
 
     return 0;
