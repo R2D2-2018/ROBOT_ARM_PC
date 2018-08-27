@@ -53,7 +53,6 @@ int Serial::readData(char *buffer, unsigned int size) {
     ClearCommError(this->hSerial, &this->errors, &this->status);
 
     if (this->status.cbInQue > 0) {
-
         while (c != '\r') {
             if (ReadFile(this->hSerial, &c, 1, &bytesRead, NULL)) {
                 response[i] = c;
@@ -69,9 +68,7 @@ int Serial::readData(char *buffer, unsigned int size) {
 bool Serial::writeData(const char *buffer, unsigned int size) {
     DWORD bytesSend;
 
-    // Try to write the buffer on the Serial port
     if (!WriteFile(this->hSerial, (void *)buffer, size, &bytesSend, 0)) {
-        // In case it don't work get comm error and return false
         ClearCommError(this->hSerial, &this->errors, &this->status);
 
         return false;

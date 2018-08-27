@@ -7,7 +7,7 @@
 #include "robot_arm.hpp"
 
 RobotArm::RobotArm() {
-    mSleep(2000); // Wait until the serial connection is set up and the uArm responds.
+    mSleep(2000); /// Wait until the serial connection is set up and the uArm responds.
     readData();
     writeData("\n\n", 2);
     currentPosition = getActualPosition();
@@ -16,7 +16,7 @@ RobotArm::RobotArm() {
 bool RobotArm::move(Coordinate3D coordinates, int speed) {
     if (isSafeToMove(coordinates)) {
         if ((currentPosition.getY() < 0 && coordinates.getY() > 0) || (currentPosition.getY() > 0 && coordinates.getY() < 0)) {
-            resetPosition(); // You can't go from one to the other side directly, so we move the arm back to the center first.
+            resetPosition(); /// You can't go from one to the other side directly, so we move the arm back to the center first.
         }
         saveCoordinates(coordinates);
         saveSpeed(speed);
@@ -36,7 +36,7 @@ bool RobotArm::rotateClaw(int value) {
         strcat(gCode, "\n");
         writeData(gCode, sizeof(gCode));
         mSleep(300);
-        writeData(gCode, sizeof(gCode)); // Send twice intentionally, sometimes the claw doesn't reach the other side completely.
+        writeData(gCode, sizeof(gCode)); /// Send twice intentionally, sometimes the claw doesn't reach the other side completely.
         return true;
     }
     return false;
@@ -323,7 +323,7 @@ bool RobotArm::isSafeToMove(Coordinate3D coordinates) {
 bool RobotArm::commandDone(int state) {
     readData();
 
-    if (state == 0) { // "ok" command
+    if (state == 0) { /// "ok" command
         for (unsigned int i = 0; i < sizeof(response); i++) {
             if ((response[i] == 'o') && (response[i + 1] == 'k')) {
                 return true;
@@ -332,7 +332,7 @@ bool RobotArm::commandDone(int state) {
         return false;
     }
 
-    else if (state == 1) { // Moving
+    else if (state == 1) { /// Moving
         if (currentPosition == getActualPosition()) {
             return true;
         }

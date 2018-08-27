@@ -89,6 +89,8 @@ class RobotArm {
      * Move the uArm to a given position in the X direction.
      *
      * @param value
+     * @return true, if it's safe to move.
+     * @return false, it it isn't safe to move.
      */
     bool moveX(int value);
     /**
@@ -252,7 +254,6 @@ class RobotArm {
      * State 1, wait for the uArm to finish moving the arm.
      *
      * @param state
-     *
      * @return 0, when not ready
      * @return 1, when ready
      */
