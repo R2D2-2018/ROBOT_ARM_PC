@@ -1,0 +1,16 @@
+1. Reset position.
+2. Move to (150, 150, 100) with a speed with 50000 and wait for it to finish.
+3. Reset position and wait for it to finish.
+4. Move X to 20 and wait for it to finish.
+5. Move Y to 100 and wait for it to finish.
+6. Move Z to 80 and wait for it to finish.
+7. Move X with 10 and wait for it to finish.
+8. Move Y with -10 and wait for it to finish.
+9. Move Z with -10 and wait for it to finish.
+10. Reset position and wait for it to finish.
+11. Rotate claw to 180 degrees and wait a second.
+12. Rotate claw to 0 degreses and wait a second.
+13. Close claw and wait 2 seconds.
+14. Open claw and wait 2 seconds.
+15. Enable the pump and wait 2 seconds.
+16. Disable the pump and wait 2 seconds.
